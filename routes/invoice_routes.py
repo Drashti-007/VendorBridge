@@ -84,3 +84,23 @@ def get_invoice(invoice_id):
         "total_amount": inv.total_amount,
         "status": inv.status
     }), 200
+
+@invoice_bp.route("/invoices/<int:invoice_id>/status", methods=["PUT"])
+def update_invoice_status(invoice_id):
+
+    invoice = Invoice.query.get(invoice_id)
+
+    if not invoice:
+        return jsonify({
+            "message": "Invoice not found"
+        }), 404
+
+    data = request.json
+
+    invoice.status = data["status"]
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Invoice status updated"
+    }), 200
