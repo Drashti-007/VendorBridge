@@ -12,7 +12,6 @@ from routes.invoice_routes import invoice_bp
 from routes.activity_routes import activity_bp
 from routes.analytics_routes import analytics_bp
 
-
 app = Flask(__name__)
 
 app.secret_key = "vendorbridge_secret_key"
@@ -42,6 +41,7 @@ from models.approval import Approval
 from models.purchase_order import PurchaseOrder
 from models.invoice import Invoice
 from models.rfq_vendor import rfq_vendors
+from models.activity_log import ActivityLog
 
 @app.route('/')
 def home():
