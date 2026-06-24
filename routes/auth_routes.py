@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from models.user import User
 from database import db
-
+from models.activity_log import ActivityLog
 
 auth_bp = Blueprint(
     "auth",
@@ -61,6 +61,14 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
+    activity = ActivityLog(
+        user_id=new_user.id,
+        action="Registered a new account"
+    )
+
+    db.session.add(activity)
+    db.session.commit()
+
     if not data:
         return jsonify({
             "message": "No data provided"
@@ -99,6 +107,14 @@ def login():
     # Password is correct
     session["user_id"] = user.id
     session["role"] = user.role
+
+    activity = ActivityLog(
+        user_id = user.id,
+        action = "Logged into the system"
+    )
+
+    db.session.add(activity)
+    db.session.commit()
 
     if "email" not in data or "password" not in data:
         return jsonify({
@@ -140,6 +156,14 @@ def forgot_password():
         new_password
     )
 
+    db.session.commit()
+
+    activity = ActivityLog(
+        user_id=user.id,
+        action="Reset account password"
+    )
+
+    db.session.add(activity)
     db.session.commit()
 
     return jsonify({
