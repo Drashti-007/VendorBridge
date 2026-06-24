@@ -10,7 +10,7 @@ from routes.approval_routes import approval_bp
 from routes.purchase_order_routes import purchase_order_bp
 from routes.invoice_routes import invoice_bp
 from routes.activity_routes import activity_bp
-
+from routes.analytics_routes import analytics_bp
 
 
 app = Flask(__name__)
@@ -32,7 +32,7 @@ app.register_blueprint(approval_bp)
 app.register_blueprint(purchase_order_bp)
 app.register_blueprint(invoice_bp)
 app.register_blueprint(activity_bp)
-
+app.register_blueprint(analytics_bp)
 
 from models.user import User
 from models.vendor import Vendor
