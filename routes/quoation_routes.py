@@ -5,7 +5,7 @@ from models.quotation import Quotation
 from models.rfq import RFQ
 from models.vendor import Vendor
 from utils.logger import log_activity
-
+from flask_jwt_extended import jwt_required
 
 quotation_bp = Blueprint(
     "quotation",
@@ -16,6 +16,7 @@ quotation_bp = Blueprint(
     "/quotations",
     methods=["POST"]
 )
+@jwt_required()
 def create_quotation():
 
     data = request.json

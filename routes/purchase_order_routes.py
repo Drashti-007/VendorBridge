@@ -6,6 +6,7 @@ from models.purchase_order import PurchaseOrder
 from models.approval import Approval
 from models.quotation import Quotation
 from utils.logger import log_activity
+from flask_jwt_extended import jwt_required
 
 purchase_order_bp = Blueprint(
     "purchase_order",
@@ -16,6 +17,7 @@ purchase_order_bp = Blueprint(
     "/purchase-orders",
     methods=["POST"]
 )
+@jwt_required()
 def create_purchase_order():
 
     data = request.json

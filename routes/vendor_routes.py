@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from database import db
 from models.vendor import Vendor
 from auth.decorators import role_required
-
+from flask_jwt_extended import jwt_required
 
 vendor_bp = Blueprint(
     "vendor",
@@ -14,6 +14,7 @@ vendor_bp = Blueprint(
     "/vendors",
     methods=["POST"]
 )
+@jwt_required()
 @role_required("admin")
 def create_vendor():
 
@@ -45,6 +46,7 @@ def create_vendor():
     "/vendors",
     methods=["GET"]
 )
+@jwt_required()
 def get_vendors():
 
     vendors = Vendor.query.all()

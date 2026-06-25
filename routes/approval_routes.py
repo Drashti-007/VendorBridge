@@ -4,6 +4,7 @@ from database import db
 from models.approval import Approval
 from models.quotation import Quotation
 from utils.logger import log_activity
+from flask_jwt_extended import jwt_required
 
 approval_bp = Blueprint(
     "approval",
@@ -14,6 +15,7 @@ approval_bp = Blueprint(
     "/approvals",
     methods=["POST"]
 )
+@jwt_required()
 def approve_quotation():
 
     data = request.json

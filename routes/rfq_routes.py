@@ -5,6 +5,7 @@ from database import db
 from models.rfq import RFQ
 from models.vendor import Vendor
 from utils.logger import log_activity
+from flask_jwt_extended import jwt_required
 
 rfq_bp = Blueprint(
     "rfq",
@@ -15,6 +16,7 @@ rfq_bp = Blueprint(
     "/rfqs",
     methods=["POST"]
 )
+@jwt_required()
 def create_rfq():
 
     data = request.json
@@ -51,6 +53,7 @@ def create_rfq():
     "/rfqs",
     methods=["GET"]
 )
+@jwt_required()
 def get_rfqs():
 
     rfqs = RFQ.query.all()

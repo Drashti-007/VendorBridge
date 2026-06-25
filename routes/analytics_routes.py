@@ -7,6 +7,7 @@ from models.quotation import Quotation
 from models.approval import Approval
 from models.purchase_order import PurchaseOrder
 from models.invoice import Invoice
+from flask_jwt_extended import jwt_required
 
 analytics_bp = Blueprint(
     "analytics",
@@ -17,6 +18,7 @@ analytics_bp = Blueprint(
     "/analytics",
     methods=["GET"]
 )
+@jwt_required()
 def get_analytics():
 
     approved_quotations = Approval.query.filter_by(
