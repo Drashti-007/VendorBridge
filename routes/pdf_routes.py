@@ -12,6 +12,10 @@ from reportlab.lib.styles import getSampleStyleSheet
 from models.invoice import Invoice
 import os
 from datetime import datetime
+from models.purchase_order import PurchaseOrder
+from models.quotation import Quotation
+from models.vendor import Vendor
+
 
 pdf_bp = Blueprint(
     "pdf",
@@ -158,4 +162,144 @@ def generate_invoice_pdf(invoice_id):
     return send_file(
         filename,
         as_attachment=True
+    )
+
+@pdf_bp.route(
+    "/purchase-orders/<int:po_id>/pdf",
+    methods=["GET"]
+)
+def generate_po_pdf(po_id):
+
+    po = PurchaseOrder.query.get(po_id)
+
+    if not po:
+        return {
+            "message": "Purchase Order not found"
+        }, 404
+    
+    quotation = Quotation.query.get(
+        po.quotation_id
+    )
+
+    vendor = Vendor.query.get(
+        quotation.vendor_id
+    )
+
+    os.makedirs("pdfs", exist_ok=True)
+
+    filename = f"pdfs/po_{po.id}.pdf"
+
+    doc = SimpleDocTemplate(filename)
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    elements.append(
+        Paragraph(
+            "VendorBridge",
+            styles["Title"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "PURCHASE ORDER",
+            styles["Heading2"]
+        )
+    )
+
+    elements.append(Spacer(1, 20))
+
+    elements.append(
+        Paragraph(
+            f"PO number: {po.po_number}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Date: {datetime.now().strftime('%d-%m-%Y')}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Status: {po.status}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(Spacer(1, 20))
+
+    elements.append(
+        Paragraph(
+            "Vendor Information",
+            styles["Heading3"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Company: {vendor.company_name}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Contact: {vendor.contact_person}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Email: {vendor.email}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(Spacer(1, 20))
+
+    data = [
+        ["Description", "Value"],
+        ["Quoted Price", f"Rs.{quotation.price}"],
+        ["Delivery Days", str(quotation.delivery_days)],
+        ["Status", quotation.status]
+    ]
+
+    table = Table(
+        data,
+        colWidths=[250, 150]
+    )
+
+    table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER")
+        ])
+    )
+
+    elements.append(table)
+
+    elements.append(Spacer(1, 30))
+
+    elements.append(
+        Paragraph(
+            "This purchase order is system generated.",
+            styles["Italic"]
+        )
+    )
+
+    doc.build(elements)
+
+    return send_file(
+        filename,
+        as_attachment=True,
+        download_name=f"PO_{po.po_number}.pdf"
     )
