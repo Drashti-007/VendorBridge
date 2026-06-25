@@ -22,9 +22,11 @@ def get_activities():
             "id": activity.id,
             "user_id": activity.user_id,
             "action": activity.action,
-            "created_at": str(
-                activity.created_at
+            "entity_type": activity.entity_type,
+            "entity_id": activity.entity_id,
+            "timestamp": str(
+                activity.timestamp
             )
         })
 
-    return jsonify(result)
+    return jsonify(result), 200
