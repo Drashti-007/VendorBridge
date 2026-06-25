@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from database import db
 from models.vendor import Vendor
 from auth.decorators import role_required
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import get_jwt, jwt_required
 
 vendor_bp = Blueprint(
     "vendor",
@@ -17,6 +17,13 @@ vendor_bp = Blueprint(
 @jwt_required()
 @role_required("admin")
 def create_vendor():
+
+    claims = get_jwt()
+
+    if claims["role"] != "admin":
+        return jsonify({
+            "message": "Access denied"
+        }),403
 
     data = request.json
 
