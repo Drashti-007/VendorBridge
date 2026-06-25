@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash
 from models.user import User
 from database import db
 from models.activity_log import ActivityLog
+from flask_jwt_extended import create_access_token
 
 auth_bp = Blueprint(
     "auth",
@@ -121,9 +122,16 @@ def login():
             "message": "Email and password are required"
         }), 400
 
+    token = create_access_token(
+        identity=str(user.id),
+        additional_claims={
+            "role": user.role
+        }
+    )
+
     return jsonify({
         "message": "Login Success",
-        "user_id": user.id,
+        "token": token,
         "role": user.role
     }), 200
 

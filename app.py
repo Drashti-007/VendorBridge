@@ -13,6 +13,7 @@ from routes.activity_routes import activity_bp
 from routes.analytics_routes import analytics_bp
 from routes.pdf_routes import pdf_bp 
 from routes.chart_routes import chart_bp
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
@@ -22,6 +23,9 @@ CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vendorbridge.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["JWT_SECRET_KEY"] = "vendorbridge_secret"
+
+jwt = JWTManager(app)
 
 db.init_app(app)
 
