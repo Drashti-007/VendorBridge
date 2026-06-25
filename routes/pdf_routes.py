@@ -1,8 +1,17 @@
 from flask import Blueprint, send_file
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import (
+    SimpleDocTemplate, 
+    Paragraph, 
+    Spacer,
+    Table,
+    TableStyle
+)
+
+from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from models.invoice import Invoice
 import os
+from datetime import datetime
 
 pdf_bp = Blueprint(
     "pdf",
@@ -36,6 +45,13 @@ def generate_invoice_pdf(invoice_id):
         Paragraph(
             "VendorBridge Invoice",
             styles["Title"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "PROCUREMENT INVOICE",
+            styles["Heading2"]
         )
     )
 
@@ -86,6 +102,53 @@ def generate_invoice_pdf(invoice_id):
     elements.append(
         Paragraph(
             f"Status: {invoice.status}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            f"Date: {datetime.now().strftime('%d-%m-%Y')}",
+            styles["Normal"]
+        )
+    )
+
+    elements.append(Spacer(1, 20))
+
+    data = [
+        ["Description", "Amount"],
+        ["Subtotal", f"Rs.{invoice.subtotal}"],
+        ["Tax", f"Rs.{invoice.tax_amount}"],
+        ["TOTAL", f"Rs.{invoice.total_amount}"]
+    ]
+
+    table = Table(data, colWidths=[250, 150])
+
+    table.setStyle(
+        TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("FONTNAME", (0, 3), (-1, 3), "Helvetica-Bold"),
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 12)   
+        ])
+    )
+
+    elements.append(table)
+
+    elements.append(Spacer(1, 20))
+
+    elements.append(
+        Paragraph(
+            "Thank you for using VendorBridge.",
+            styles["Italic"]
+        )
+    )
+
+    elements.append(
+        Paragraph(
+            "This is a system-generated invoice.",
             styles["Normal"]
         )
     )
